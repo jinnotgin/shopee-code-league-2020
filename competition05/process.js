@@ -29,8 +29,9 @@ const addWorkingDays = (date, days) => {
 		// check if new date is a publicHoliday
 		const isPublicHoliday = publicHolidays.some((item) => date.isSame(item));
 
-		// decrease "days" only if it's a sunday and not a public holiday.
-		if (!isPublicHoliday && date.isoWeekday() !== 7) {
+		// decrease "days" only if it's not a sunday and not a public holiday.
+		const isSunday = date.isoWeekday() !== 7;
+		if (!isPublicHoliday && !isSunday) {
 			days -= 1;
 		}
 	}
