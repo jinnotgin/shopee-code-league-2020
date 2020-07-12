@@ -2,8 +2,8 @@
 // Team: Jinjcha?!
 // Author: Jin
 
-// const INPUT_FILE = "delivery_orders_march_sample.csv";
-const INPUT_FILE = "delivery_orders_march.csv";
+const INPUT_FILE = "delivery_orders_march_sample.csv";
+// const INPUT_FILE = "delivery_orders_march.csv";
 
 const moment = require("moment");
 const csv = require("csv-parser");
@@ -79,16 +79,16 @@ const cleanAddress = (item) => {
 const getZone = (address) => {
 	let result = false;
 	let foundZones = 0;
-	let lastfoundPosition = -1;
+	let lastFoundPosition = -1;
 
 	for (var i = 0; i < zones.length; i++) {
 		const currentZone = zones[i];
 
 		const foundPosition = address.indexOf(currentZone);
 		// in case the address matches with 2 zones, we will prioritise zones found later in the address
-		if (foundPosition > lastfoundPosition) {
+		if (foundPosition > lastFoundPosition) {
 			result = currentZone.trim();
-			lastfoundPosition = foundPosition;
+			lastFoundPosition = foundPosition;
 			foundZones += 1;
 			// break;
 		}
@@ -108,6 +108,10 @@ const getSla = (seller, buyer) => {
 	return noError ? sla[seller_zone][buyer_zone] : false;
 };
 
+const processUnixTime = (unixTime) => {
+	return moment.unix(unixTime).startOf("day");
+};
+
 const processData = (data) => {
 	const {
 		orderid,
@@ -120,12 +124,10 @@ const processData = (data) => {
 
 	const hasSecondAttempt = second_deliver_attempt !== "";
 
-	const pick_moment = moment.unix(pick).startOf("day");
-	const first_deliver_moment = moment
-		.unix(first_deliver_attempt)
-		.startOf("day");
+	const pick_moment = processUnixTime(pick);
+	const first_deliver_moment = processUnixTime(first_deliver_attempt);
 	const second_deliver_moment = hasSecondAttempt
-		? moment.unix(second_deliver_attempt).startOf("day")
+		? processUnixTime(second_deliver_attempt)
 		: false;
 
 	const sla_days = getSla(selleraddress, buyeraddress);
